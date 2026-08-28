@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>verum</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#111;--muted:#777;--faint:#ccc;--hair:#e6e6e6;--hair2:#ddd}
+body{
+  font-family:'IBM Plex Mono',monospace; background:#fff; color:var(--ink);
+  min-height:100svh; padding:3rem 1.5rem 4rem; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+main{max-width:660px; margin:0 auto}
+
+/* ---- masthead ---- */
+.head{text-align:center; margin-bottom:2.6rem}
+.face{font-size:2.4rem; line-height:1; margin-bottom:.7rem}
+h1{font-size:2.4rem; font-weight:500; letter-spacing:-.04em; margin-bottom:.7rem}
+.tag{font-size:.78rem; color:var(--muted); line-height:1.9}
+
+/* ---- mode switch ---- */
+.modes{display:flex; justify-content:center; gap:1.6rem; margin-bottom:2.2rem; font-size:.82rem}
+.modes button{
+  font-family:inherit; font-size:inherit; background:none; border:0; cursor:pointer;
+  color:var(--muted); padding:0 0 2px; border-bottom:1px solid transparent;
+}
+.modes button[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--ink)}
+.modes button:focus-visible{outline:2px solid var(--ink); outline-offset:3px}
+
+.notation{display:flex; justify-content:center; align-items:center; gap:.7rem; margin:-1.4rem 0 2.4rem; font-size:.7rem; color:var(--muted)}
+.notation .lead{color:var(--faint); letter-spacing:.14em; text-transform:uppercase; font-size:.58rem}
+.notation button{font-family:inherit; font-size:inherit; background:none; border:0; cursor:pointer; color:var(--muted); padding:0 0 2px; border-bottom:1px solid transparent}
+.notation button[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--ink)}
+.notation button:focus-visible{outline:2px solid var(--ink); outline-offset:3px}
+.notation .sep{color:var(--faint)}
+
+/* ---- inputs: underline style, no boxes ---- */
+.label{font-size:.62rem; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem}
+.uline{position:relative; display:flex; align-items:center; gap:.6rem}
+input[type=text]{
+  font-family:inherit; font-size:1.15rem; color:var(--ink); width:100%;
+  background:transparent; border:0; border-bottom:1px solid var(--ink);
+  padding:.35rem .1rem; letter-spacing:.01em;
+}
+input[type=text]:focus{outline:none; border-bottom-width:2px; margin-bottom:-1px}
+input.bad{border-bottom-color:var(--ink); border-bottom-style:dashed}
+.x{font-family:inherit; background:none; border:0; color:var(--faint); font-size:1.1rem; cursor:pointer; padding:.2rem}
+.x:hover{color:var(--ink)}
+
+.palette{display:flex; gap:.9rem; margin:.9rem 0 0; align-items:center; flex-wrap:wrap}
+.palette span.hint{font-size:.62rem; color:var(--faint); letter-spacing:.1em}
+.palette button{
+  font-family:inherit; font-size:1.05rem; background:none; border:0; color:var(--muted); cursor:pointer; padding:0
+}
+.palette button:hover{color:var(--ink)}
+.palette button:focus-visible{outline:2px solid var(--ink); outline-offset:3px}
+
+/* ---- argument premises ---- */
+.premise{display:flex; align-items:center; gap:.6rem; margin-bottom:.8rem}
+.premise .n{font-size:.72rem; color:var(--faint); width:1.4rem; flex:0 0 1.4rem}
+.turn{text-align:center; font-size:1.1rem; color:var(--muted); margin:1.2rem 0 1.4rem}
+.add{font-family:inherit; font-size:.72rem; color:var(--muted); background:none; border:0; cursor:pointer; padding:0; border-bottom:1px solid var(--hair2)}
+.add:hover{color:var(--ink); border-bottom-color:var(--ink)}
+
+/* ---- examples ---- */
+.egs{margin-top:1.6rem; font-size:.72rem; color:var(--muted); line-height:2.1}
+.egs .lead{color:var(--faint); letter-spacing:.14em; text-transform:uppercase; font-size:.6rem; display:block; margin-bottom:.4rem}
+.egs a{color:var(--muted); text-decoration:none; border-bottom:1px solid var(--hair2); cursor:pointer}
+.egs a:hover{color:var(--ink); border-bottom-color:var(--ink)}
+.egs .sep{color:var(--faint); margin:0 .5rem}
+
+/* ---- result ---- */
+.result{margin-top:3rem}
+.verdict{font-size:1.1rem; margin-bottom:.3rem}
+.verdict .sym{margin-right:.5rem}
+.verdict .why{color:var(--muted); font-size:.78rem}
+.echo{font-size:1rem; color:var(--muted); margin-bottom:1.6rem; word-break:break-word}
+
+.tablewrap{overflow-x:auto; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink)}
+table{border-collapse:collapse; width:100%; font-size:.8rem}
+th,td{padding:.42rem .7rem; text-align:center; white-space:nowrap}
+thead th{font-weight:500; color:var(--ink); border-bottom:1px solid var(--hair2)}
+thead th.grp{color:var(--muted); font-weight:400}
+th.sep,td.sep{border-left:1px solid var(--hair2)}
+tbody tr{border-bottom:1px solid var(--hair)}
+tbody tr:last-child{border-bottom:0}
+td.T{color:var(--ink); font-weight:500}
+td.F{color:var(--faint)}
+td.final{background:#fafafa}
+tr.counter{background:var(--ink)}
+tr.counter td{color:#fff}
+tr.counter td.T{color:#fff}
+tr.counter td.F{color:#888}
+.note{font-size:.68rem; color:var(--muted); margin-top:.8rem; line-height:1.7}
+.note.break{color:var(--ink)}
+.err{font-size:.82rem; color:var(--ink); margin-top:2rem; border-left:2px solid var(--ink); padding-left:.9rem}
+
+footer{max-width:660px; margin:5rem auto 0; font-size:.6rem; color:var(--faint); text-align:center; line-height:2}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <div class="head">
+    <div class="face">(=ↀωↀ=)</div>
+    <h1>verum</h1>
+    <p class="tag">Type a formula, read its truth.<br>State an argument, test whether it holds.</p>
+  </div>
+
+  <div class="modes" role="tablist" aria-label="Mode">
+    <button id="tab-formula" role="tab" aria-selected="true">formula</button>
+    <button id="tab-argument" role="tab" aria-selected="false">argument</button>
+  </div>
+
+  <div class="notation" role="group" aria-label="Symbols">
+    <span class="lead">symbols</span>
+    <button id="not-tf" aria-selected="true">T / F</button>
+    <span class="sep">·</span>
+    <button id="not-01" aria-selected="false">1 / 0</button>
+  </div>
+
+  <!-- FORMULA -->
+  <section id="panel-formula">
+    <p class="label">Formula</p>
+    <div class="uline">
+      <input id="f-input" type="text" spellcheck="false" autocomplete="off"
+             value="(P → Q) ∧ (Q → R) → (P → R)" aria-label="Formula">
+      <button class="x" data-clear="f-input" title="Clear">✕</button>
+    </div>
+    <div class="palette" data-target="f-input">
+      <span class="hint">insert</span>
+      <button>¬</button><button>∧</button><button>∨</button><button>→</button><button>↔</button><button>⊕</button><button>(</button><button>)</button>
+    </div>
+    <div class="egs"><span class="lead">try</span><span id="f-egs"></span></div>
+  </section>
+
+  <!-- ARGUMENT -->
+  <section id="panel-argument" hidden>
+    <p class="label">Premises</p>
+    <div id="premises"></div>
+    <button class="add" id="add-premise">+ add premise</button>
+    <div class="turn">⊨</div>
+    <p class="label">Conclusion</p>
+    <div class="uline">
+      <input id="c-input" type="text" spellcheck="false" autocomplete="off" value="M" aria-label="Conclusion">
+      <button class="x" data-clear="c-input" title="Clear">✕</button>
+    </div>
+    <div class="palette" data-target="__focus__">
+      <span class="hint">insert</span>
+      <button>¬</button><button>∧</button><button>∨</button><button>→</button><button>↔</button><button>⊕</button><button>(</button><button>)</button>
+    </div>
+    <div class="egs"><span class="lead">try</span><span id="a-egs"></span></div>
+  </section>
+
+  <div id="result" class="result" aria-live="polite"></div>
+</main>
+<footer>same engine as the maxima reference · exhaustive over all 2ⁿ worlds</footer>
+
+<script>
+/* ===== ENGINE (verified against the Maxima .mac) ===== */
+const PREC={"↔":1,"↮":1,"→":2,"←":2,"∨":3,"⊕":3,"⊽":3,"∧":4,"⊼":4};
+const RIGHT={"→":1,"←":1};
+const BINOPS=new Set(Object.keys(PREC));
+function normalize(s){return s
+  .replace(/<->|<=>|iff/gi,"↔").replace(/->|=>/g,"→")
+  .replace(/\bxor\b|\(\+\)/gi,"⊕").replace(/\bnand\b/gi,"⊼").replace(/\bnor\b/gi,"⊽")
+  .replace(/&&|&|\band\b/gi,"∧").replace(/\|\||\||\bor\b/gi,"∨")
+  .replace(/~|!|\bnot\b/gi,"¬").replace(/\btrue\b|⊤/gi,"1").replace(/\bfalse\b|⊥/gi,"0");}
+function tokenize(s){const t=[];let i=0;while(i<s.length){const c=s[i];
+  if(/\s/.test(c)){i++;continue;}
+  if(c==="("||c===")"){t.push({k:c});i++;continue;}
+  if(c==="¬"){t.push({k:"¬"});i++;continue;}
+  if(BINOPS.has(c)){t.push({k:"op",v:c});i++;continue;}
+  if(c==="1"||c==="0"){t.push({k:"const",v:c==="1"});i++;continue;}
+  if(/[A-Za-z]/.test(c)){let j=i+1;while(j<s.length&&/[A-Za-z0-9_]/.test(s[j]))j++;
+    const w=s.slice(i,j);
+    if(w==="T")t.push({k:"const",v:true});else if(w==="F")t.push({k:"const",v:false});
+    else t.push({k:"atom",v:w}); i=j; continue;}
+  throw new Error("I don't recognise “"+c+"”");}
+  return t;}
+function parse(src){const toks=tokenize(normalize(src));let p=0;
+  const peek=()=>toks[p],next=()=>toks[p++];
+  function primary(){const t=peek();
+    if(!t)throw new Error("the formula is unfinished");
+    if(t.k==="("){next();const e=expr(0);if(!peek()||peek().k!==")")throw new Error("missing a closing )");next();return e;}
+    if(t.k==="¬"){next();return{t:"¬",a:primary()};}
+    if(t.k==="const"){next();return{t:"const",v:t.v};}
+    if(t.k==="atom"){next();return{t:"atom",v:t.v};}
+    throw new Error("didn't expect “"+(t.v||t.k)+"” here");}
+  function expr(mp){let left=primary();
+    while(peek()&&peek().k==="op"&&PREC[peek().v]>=mp){const op=next().v;
+      const nm=RIGHT[op]?PREC[op]:PREC[op]+1; left={t:op,a:left,b:expr(nm)};}
+    return left;}
+  if(toks.length===0)throw new Error("empty");
+  const e=expr(0);
+  if(p<toks.length)throw new Error("unexpected “"+(peek().v||peek().k)+"” — maybe a missing operator?");
+  return e;}
+function atomsOf(a,set){set=set||new Set();
+  if(a.t==="atom")set.add(a.v);else if(a.t==="¬")atomsOf(a.a,set);
+  else if(a.b){atomsOf(a.a,set);atomsOf(a.b,set);}return set;}
+function ev(a,e){switch(a.t){
+  case"const":return a.v;case"atom":return!!e[a.v];case"¬":return!ev(a.a,e);
+  case"∧":return ev(a.a,e)&&ev(a.b,e);case"⊼":return!(ev(a.a,e)&&ev(a.b,e));
+  case"∨":return ev(a.a,e)||ev(a.b,e);case"⊽":return!(ev(a.a,e)||ev(a.b,e));
+  case"⊕":return ev(a.a,e)!==ev(a.b,e);
+  case"→":return!ev(a.a,e)||ev(a.b,e);case"←":return ev(a.a,e)||!ev(a.b,e);
+  case"↔":return ev(a.a,e)===ev(a.b,e);case"↮":return ev(a.a,e)!==ev(a.b,e);}}
+function worldsOf(atoms){const n=atoms.length,out=[];
+  for(let i=0;i<(1<<n);i++){const e={};for(let k=0;k<n;k++)e[atoms[k]]=!!(i&(1<<k));out.push(e);}return out;}
+function show(a){
+  if(a.t==="atom")return a.v;if(a.t==="const")return a.v?"⊤":"⊥";
+  if(a.t==="¬"){const s=show(a.a);return"¬"+(a.a.t==="atom"||a.a.t==="¬"||a.a.t==="const"?s:"("+s+")");}
+  const p=PREC[a.t];
+  const wrap=(c,side)=>{const s=show(c);
+    if(c.t==="atom"||c.t==="const"||c.t==="¬")return s;
+    const cp=PREC[c.t];const need=cp<p||(cp===p&&(RIGHT[a.t]?side==="L":side==="R"));
+    return need?"("+s+")":s;};
+  return wrap(a.a,"L")+" "+a.t+" "+wrap(a.b,"R");}
+function sizeOf(a){return a.t==="atom"||a.t==="const"?1:a.t==="¬"?1+sizeOf(a.a):1+sizeOf(a.a)+sizeOf(a.b);}
+function subformulas(a,acc){acc=acc||[];
+  if(a.t==="¬")subformulas(a.a,acc);else if(a.b){subformulas(a.a,acc);subformulas(a.b,acc);}
+  if(a.t!=="atom"&&a.t!=="const")acc.push(a);return acc;}
+
+/* ===== EXAMPLES ===== */
+const F_EGS=[
+  {en:"hypothetical syllogism", f:"(P → Q) ∧ (Q → R) → (P → R)"},
+  {en:"excluded middle", f:"P ∨ ¬P"},
+  {en:"de morgan", f:"¬(P ∧ Q) ↔ (¬P ∨ ¬Q)"},
+  {en:"contradiction", f:"P ∧ ¬P"},
+  {en:"peirce's law", f:"((P → Q) → P) → P"},
+];
+const A_EGS=[
+  {name:"modus ponens", prem:["R → C","R"], concl:"C"},
+  {name:"affirming the consequent", prem:["R → C","C"], concl:"R"},
+  {name:"modus tollens", prem:["A → L","¬L"], concl:"¬A"},
+  {name:"disjunctive syllogism", prem:["B ∨ M","¬B"], concl:"M"},
+  {name:"denying the antecedent", prem:["S → P","¬S"], concl:"¬P"},
+  {name:"constructive dilemma", prem:["U → H","N → D","U ∨ N"], concl:"H ∨ D"},
+];
+
+/* ===== RENDER ===== */
+const $=s=>document.querySelector(s);
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+function tableHTML(cols,rows){
+  let h='<div class="tablewrap"><table><thead><tr>';
+  cols.forEach(c=>h+=`<th class="${c.sep?'sep ':''}${c.grp?'grp':''}">${esc(c.label)}</th>`);
+  h+='</tr></thead><tbody>';
+  rows.forEach(r=>{h+=`<tr class="${r.counter?'counter':''}">`;
+    r.cells.forEach((v,i)=>{const c=cols[i];
+      h+=`<td class="${v?'T':'F'} ${c.sep?'sep ':''}${c.final?'final':''}">${glyph(v)}</td>`;});
+    h+='</tr>';});
+  return h+'</tbody></table></div>';}
+
+function renderFormula(){
+  const out=$("#result"); let ast;
+  try{ast=parse($("#f-input").value);}catch(e){
+    $("#f-input").classList.add("bad");
+    out.innerHTML=`<p class="err">Can't read that — ${esc(e.message)}.</p>`;return;}
+  $("#f-input").classList.remove("bad");
+  const atoms=[...atomsOf(ast)].sort();
+  if(atoms.length>8){out.innerHTML=`<p class="err">${atoms.length} variables is ${1<<atoms.length} rows — try 8 or fewer.</p>`;return;}
+  const seen=new Map(); subformulas(ast).forEach(s=>{const k=show(s);if(!seen.has(k))seen.set(k,s);});
+  const comp=[...seen.values()].sort((x,y)=>sizeOf(x)-sizeOf(y)||show(x).localeCompare(show(y)));
+  const cols=[...atoms.map(a=>({label:a})),
+    ...comp.map((s,i)=>({label:show(s),sep:i===0,final:i===comp.length-1}))];
+  const rows=worldsOf(atoms).map(e=>({cells:[...atoms.map(a=>e[a]),...comp.map(s=>ev(s,e))]}));
+  const res=worldsOf(atoms).map(e=>ev(ast,e));
+  const nT=res.filter(Boolean).length,tot=res.length;
+  let sym,big,why;
+  if(nT===tot){sym="⊨";big="tautology";why="true in every one of the "+tot+" worlds.";}
+  else if(nT===0){sym="⊥";big="contradiction";why="false everywhere — unsatisfiable.";}
+  else{sym="◐";big="contingent";why=`true in ${nT} of ${tot} worlds.`;}
+  out.innerHTML=`<div class="verdict"><span class="sym">${sym}</span>${big} <span class="why">— ${why}</span></div>
+    <div class="echo">${esc(show(ast))}</div>${tableHTML(cols,rows)}
+    <p class="note">Columns grow left to right: variables, then each sub-formula, ending in the whole.</p>`;
+}
+
+function premiseInputs(){return[...document.querySelectorAll("#premises input")];}
+function renderArgument(){
+  const out=$("#result");
+  const raw=premiseInputs().map(i=>i.value.trim()).filter(s=>s.length);
+  const rc=$("#c-input").value.trim();
+  let prem,concl;
+  try{prem=raw.map(parse); if(!rc)throw new Error("state a conclusion"); concl=parse(rc);
+    $("#c-input").classList.remove("bad");}
+  catch(e){out.innerHTML=`<p class="err">Can't read that — ${esc(e.message)}.</p>`;return;}
+  const as=new Set(); prem.forEach(p=>atomsOf(p,as)); atomsOf(concl,as);
+  const atoms=[...as].sort();
+  if(atoms.length===0){out.innerHTML=`<p class="err">Add at least one variable.</p>`;return;}
+  if(atoms.length>8){out.innerHTML=`<p class="err">${atoms.length} variables is too many worlds to show — try 8 or fewer.</p>`;return;}
+  const cols=[...atoms.map(a=>({label:a})),
+    ...prem.map((p,i)=>({label:show(p),grp:true,sep:i===0})),
+    {label:show(concl),final:true}];
+  let counter=null;
+  const rows=worldsOf(atoms).map(e=>{
+    const pv=prem.map(p=>ev(p,e)),cv=ev(concl,e),allP=pv.every(Boolean),isC=allP&&!cv;
+    if(isC&&!counter)counter=e;
+    return{cells:[...atoms.map(a=>e[a]),...pv,cv],counter:isC};});
+  const valid=!counter, sym=valid?"⊨":"⊭", big=valid?"valid":"invalid";
+  const why=valid?"in every world where the premises hold, so does the conclusion."
+                 :"some world makes every premise true but the conclusion false.";
+  let cnote="";
+  if(counter){const d=atoms.map(a=>`${a} ${counter[a]?'true':'false'}`).join(" · ");
+    cnote=`<p class="note break">Counterexample — ${d}. Premises hold; conclusion fails.</p>`;}
+  out.innerHTML=`<div class="verdict"><span class="sym">${sym}</span>${big} <span class="why">— ${why}</span></div>
+    ${tableHTML(cols,rows)}
+    <p class="note">Premise columns, then the conclusion.${valid?" No row breaks it.":" The black row is the break."}</p>${cnote}`;
+}
+
+let mode="formula";
+let notation="tf";
+const glyph=v=>notation==="01"?(v?"1":"0"):(v?"T":"F");
+const render=()=>mode==="formula"?renderFormula():renderArgument();
+
+function setNotation(n){notation=n;
+  $("#not-tf").setAttribute("aria-selected",n==="tf");
+  $("#not-01").setAttribute("aria-selected",n==="01");
+  render();}
+$("#not-tf").addEventListener("click",()=>setNotation("tf"));
+$("#not-01").addEventListener("click",()=>setNotation("01"));
+
+function insertAt(input,t){const s=input.selectionStart??input.value.length,e=input.selectionEnd??input.value.length;
+  input.value=input.value.slice(0,s)+t+input.value.slice(e);
+  const p=s+t.length; input.focus(); input.setSelectionRange(p,p);}
+let lastFocused=null;
+document.addEventListener("focusin",e=>{if(e.target.matches('input[type=text]'))lastFocused=e.target;});
+document.querySelectorAll(".palette").forEach(pal=>pal.querySelectorAll("button").forEach(b=>
+  b.addEventListener("click",()=>{const tg=pal.dataset.target;
+    const input=tg==="__focus__"?(lastFocused||$("#c-input")):$("#"+tg);
+    insertAt(input,b.textContent); render();})));
+document.querySelectorAll("[data-clear]").forEach(b=>b.addEventListener("click",()=>{
+  const i=$("#"+b.dataset.clear); i.value=""; i.focus(); render();}));
+
+function addPremise(val){const w=document.createElement("div"); w.className="premise";
+  w.innerHTML=`<span class="n"></span>
+    <input type="text" spellcheck="false" autocomplete="off" value="${val?esc(val):""}" aria-label="Premise">
+    <button class="x" title="Remove">✕</button>`;
+  w.querySelector("input").addEventListener("input",render);
+  w.querySelector("button").addEventListener("click",()=>{w.remove();renumber();render();});
+  $("#premises").appendChild(w); renumber();}
+function renumber(){document.querySelectorAll("#premises .n").forEach((t,i)=>t.textContent=(i+1)+".");}
+$("#add-premise").addEventListener("click",()=>{addPremise("");render();});
+
+function setMode(m){mode=m;const f=m==="formula";
+  $("#tab-formula").setAttribute("aria-selected",f); $("#tab-argument").setAttribute("aria-selected",!f);
+  $("#panel-formula").hidden=!f; $("#panel-argument").hidden=f; render();}
+$("#tab-formula").addEventListener("click",()=>setMode("formula"));
+$("#tab-argument").addEventListener("click",()=>setMode("argument"));
+$("#f-input").addEventListener("input",render);
+$("#c-input").addEventListener("input",render);
+
+// example links
+const fe=$("#f-egs");
+F_EGS.forEach((ex,i)=>{const a=document.createElement("a");a.textContent=ex.en;a.tabIndex=0;
+  a.addEventListener("click",()=>{$("#f-input").value=ex.f;setMode("formula");render();});
+  a.addEventListener("keydown",e=>{if(e.key==="Enter")a.click();});
+  if(i)fe.appendChild(Object.assign(document.createElement("span"),{className:"sep",textContent:"·"}));
+  fe.appendChild(a);});
+const ae=$("#a-egs");
+A_EGS.forEach((ex,i)=>{const a=document.createElement("a");a.textContent=ex.name;a.tabIndex=0;
+  a.addEventListener("click",()=>{$("#premises").innerHTML="";ex.prem.forEach(p=>addPremise(p));
+    $("#c-input").value=ex.concl;setMode("argument");render();});
+  a.addEventListener("keydown",e=>{if(e.key==="Enter")a.click();});
+  if(i)ae.appendChild(Object.assign(document.createElement("span"),{className:"sep",textContent:"·"}));
+  ae.appendChild(a);});
+
+// init
+addPremise("B ∨ M"); addPremise("¬B");
+render();
+</script>
+</body>
+</html>
