@@ -96,6 +96,28 @@ tr.counter td.T{color:#fff}
 tr.counter td.F{color:#888}
 .note{font-size:.68rem; color:var(--muted); margin-top:.8rem; line-height:1.7}
 .note.break{color:var(--ink)}
+.fractalwrap{overflow-x:auto; padding:.3rem 0}
+.fractal{display:grid; width:max-content; font-size:.72rem; line-height:1.2}
+.fractal span{text-align:center}
+.fractal span.T{color:var(--ink); font-weight:500}
+.fractal span.F{color:#ededed}
+.proof{border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); margin-top:.4rem}
+.step{display:grid; grid-template-columns:1.5rem minmax(0,1fr) auto; gap:.5rem 1rem; align-items:baseline; padding:.5rem .1rem; border-bottom:1px solid var(--hair); font-size:.9rem}
+.step:last-child{border-bottom:0}
+.step .sn{color:var(--faint); font-size:.7rem; text-align:right}
+.step .sf{color:var(--ink); word-break:break-word; line-height:1.5}
+.step .sl{color:var(--muted); font-size:.68rem; text-align:right; white-space:nowrap}
+@media (max-width:560px){ .step{grid-template-columns:1.2rem 1fr} .step .sl{grid-column:2; text-align:left} }
+.expr{font-size:1.05rem; line-height:2; margin:.6rem 0 1rem; word-break:break-word}
+.node{border-radius:3px; padding:0 1px; cursor:pointer}
+.node:hover{background:#f2f2f2}
+.node.sel, .node.sel .node{background:var(--ink); color:#fff}
+.laws{display:flex; flex-wrap:wrap; gap:.5rem; margin:.2rem 0 .6rem}
+.lawbtn{font-family:inherit; font-size:.78rem; background:#fff; border:1px solid var(--ink); color:var(--ink); border-radius:7px; padding:.35rem .7rem; cursor:pointer}
+.lawbtn:hover{background:var(--ink); color:#fff}
+.pi-ctrl{display:flex; gap:1.2rem; margin-top:.2rem}
+.pi-ctrl button{font-family:inherit; font-size:.72rem; background:none; border:0; color:var(--muted); cursor:pointer; border-bottom:1px solid var(--hair2); padding:0 0 1px}
+.pi-ctrl button:hover{color:var(--ink); border-bottom-color:var(--ink)}
 .err{font-size:.82rem; color:var(--ink); margin-top:2rem; border-left:2px solid var(--ink); padding-left:.9rem}
 
 footer{max-width:660px; margin:5rem auto 0; font-size:.6rem; color:var(--faint); text-align:center; line-height:2}
@@ -113,6 +135,8 @@ footer{max-width:660px; margin:5rem auto 0; font-size:.6rem; color:var(--faint);
   <div class="modes" role="tablist" aria-label="Mode">
     <button id="tab-formula" role="tab" aria-selected="true">formula</button>
     <button id="tab-argument" role="tab" aria-selected="false">argument</button>
+    <button id="tab-proof" role="tab" aria-selected="false">proof</button>
+    <button id="tab-fractal" role="tab" aria-selected="false">fractal</button>
   </div>
 
   <div class="notation" role="group" aria-label="Symbols">
@@ -155,9 +179,116 @@ footer{max-width:660px; margin:5rem auto 0; font-size:.6rem; color:var(--faint);
     <div class="egs"><span class="lead">try</span><span id="a-egs"></span></div>
   </section>
 
+  <!-- PROOF -->
+  <section id="panel-proof" hidden>
+    <div class="egs"><span class="lead">mode</span><span id="pmode-pick"></span></div>
+
+    <div id="proof-auto">
+      <p class="label" style="margin-top:1.4rem">Statement to prove — a theorem to derive</p>
+      <div class="uline">
+        <input id="p-input" type="text" spellcheck="false" autocomplete="off" value="(P → Q) ∧ (Q → R) → (P → R)" aria-label="Statement">
+        <button class="x" data-clear="p-input" title="Clear">✕</button>
+      </div>
+      <div class="palette" data-target="p-input">
+        <span class="hint">insert</span>
+        <button>¬</button><button>∧</button><button>∨</button><button>→</button><button>↔</button><button>⊕</button><button>(</button><button>)</button>
+      </div>
+      <div class="egs"><span class="lead">try</span><span id="p-egs"></span></div>
+      <p class="tag" style="text-align:left; margin-top:1.4rem">
+        <span style="color:var(--ink)">How it works.</span> This proves a statement the way a course does —
+        from principles, not a truth table. It rewrites the statement step by step with logical equivalences
+        (eliminate → and ↔, De Morgan, distribute, simplify) until only ⊤ remains; reaching ⊤ from the laws
+        alone is the proof. Put the same statement in the <span style="color:var(--ink)">formula</span> tab and
+        the truth table lands on the same verdict a different way — that agreement is what soundness and
+        completeness mean.
+      </p>
+    </div>
+
+    <div id="proof-inter" hidden>
+      <p class="label" style="margin-top:1.4rem">From</p>
+      <div class="uline">
+        <input id="pi-from" type="text" spellcheck="false" autocomplete="off" value="¬(P ∧ Q)" aria-label="From">
+        <button class="x" data-clear="pi-from" title="Clear">✕</button>
+      </div>
+      <p class="label" style="margin-top:1rem">Transform into</p>
+      <div class="uline">
+        <input id="pi-to" type="text" spellcheck="false" autocomplete="off" value="¬P ∨ ¬Q" aria-label="Into">
+        <button class="x" data-clear="pi-to" title="Clear">✕</button>
+      </div>
+      <div class="palette" data-target="__focus__">
+        <span class="hint">insert</span>
+        <button>¬</button><button>∧</button><button>∨</button><button>→</button><button>↔</button><button>⊕</button><button>(</button><button>)</button>
+      </div>
+      <div class="egs"><span class="lead">try</span><span id="pi-egs"></span></div>
+      <p class="tag" style="text-align:left; margin-top:1.4rem">
+        <span style="color:var(--ink)">How it works.</span> You do the deriving. Tap a sub-expression to
+        select it, then apply one of the laws that fit it; the tool performs the rewrite and records the step.
+        Keep going until the working line matches the target. Order and grouping don't matter for the goal —
+        <span style="color:var(--ink)">Q ∨ ¬P</span> counts as reaching <span style="color:var(--ink)">¬P ∨ Q</span>.
+      </p>
+    </div>
+  </section>
+
+  <!-- FRACTAL -->
+  <section id="panel-fractal" hidden>
+    <p class="tag" style="text-align:left; margin-bottom:1.4rem">
+      <span style="color:var(--ink)">An aside — where logic meets geometry.</span> These aren't proofs or
+      truth tables. They show that the same Boolean operators, applied over positions or over time, draw
+      fractals. It's here to connect the dots, not part of the logic core.
+    </p>
+    <div class="egs"><span class="lead">generator</span><span id="gen-pick"></span></div>
+
+    <!-- bitwise generator -->
+    <div id="gen-bitwise">
+      <p class="label" style="margin-top:1.4rem">Per-bit formula — variables a, b</p>
+      <div class="uline">
+        <input id="s-input" type="text" spellcheck="false" autocomplete="off" value="¬(a ∧ b)" aria-label="Per-bit formula">
+        <button class="x" data-clear="s-input" title="Clear">✕</button>
+      </div>
+      <div class="palette" data-target="s-input">
+        <span class="hint">insert</span>
+        <button>¬</button><button>∧</button><button>∨</button><button>→</button><button>↔</button><button>⊕</button><button>(</button><button>)</button>
+      </div>
+      <p class="label" style="margin-top:1.4rem">Combine across bits</p>
+      <div class="egs"><span class="lead">op</span><span id="s-combine"></span></div>
+      <div class="egs"><span class="lead">try</span><span id="s-presets"></span></div>
+      <p class="tag" style="text-align:left; margin-top:1.4rem">
+        <span style="color:var(--ink)">How it works.</span> Write the row number i and column number j in
+        binary. At each bit position the formula judges the pair (a = i's bit, b = j's bit); the answers
+        are combined down to one filled/empty. Splitting off the top bit makes each quadrant a shrunk
+        copy of the whole — that recursion is the fractal. <span style="color:var(--ink)">¬(a ∧ b)</span>
+        with ∧ blanks the quadrant where both top bits are 1, giving the gasket's three-copies-and-a-hole.
+      </p>
+    </div>
+
+    <!-- automaton generator -->
+    <div id="gen-automaton" hidden>
+      <p class="label" style="margin-top:1.4rem">Rule — variables l, c, r (left, centre, right)</p>
+      <div class="uline">
+        <input id="ca-input" type="text" spellcheck="false" autocomplete="off" value="l ⊕ r" aria-label="Automaton rule">
+        <button class="x" data-clear="ca-input" title="Clear">✕</button>
+      </div>
+      <div class="palette" data-target="ca-input">
+        <span class="hint">insert</span>
+        <button>¬</button><button>∧</button><button>∨</button><button>→</button><button>↔</button><button>⊕</button><button>(</button><button>)</button>
+      </div>
+      <div class="egs"><span class="lead">try</span><span id="ca-presets"></span></div>
+      <p class="tag" style="text-align:left; margin-top:1.4rem">
+        <span style="color:var(--ink)">How it works.</span> The top row is a single filled cell. Each row
+        below is built from the one above: every cell becomes the formula applied to its left, centre and
+        right neighbour (l, c, r). Time runs downward. <span style="color:var(--ink)">l ⊕ r</span> is
+        Rule 90 — from one seed it draws the Sierpiński triangle, because XOR of neighbours copies and
+        cancels the same way the bitwise version does.
+      </p>
+    </div>
+
+    <p class="label" style="margin-top:1.4rem">Grid size</p>
+    <div class="egs"><span class="lead">size</span><span id="s-sizes"></span></div>
+  </section>
+
   <div id="result" class="result" aria-live="polite"></div>
 </main>
-<footer>Made by Daniel Motilla (o w o)</footer>
+<footer>Made by Daniel Motilla a.k.a Astrid (o w o)</footer>
 
 <script>
 /* ===== ENGINE (verified against the Maxima .mac) ===== */
@@ -310,10 +441,244 @@ function renderArgument(){
     <p class="note">Premise columns, then the conclusion.${valid?" No row breaks it.":" The black row is the break."}</p>${cnote}`;
 }
 
+function renderBitwise(){
+  const out=$("#result"); const S=1<<fractalM, m=fractalM;
+  let phi;
+  try{ phi=parse($("#s-input").value); }
+  catch(e){ $("#s-input").classList.add("bad");
+    out.innerHTML=`<p class="err">Can't read that — ${esc(e.message)}.</p>`; return; }
+  const stray=[...atomsOf(phi)].filter(v=>v!=="a"&&v!=="b");
+  if(stray.length){ $("#s-input").classList.add("bad");
+    out.innerHTML=`<p class="err">Use only the bit-variables a and b — not ${esc(stray.join(", "))}.</p>`; return; }
+  $("#s-input").classList.remove("bad");
+  let cells="";
+  for(let i=0;i<S;i++)for(let j=0;j<S;j++){
+    let acc=(combineOp==="∧");                          // engine paints one cell:
+    for(let k=0;k<m;k++){                               // apply φ to bit k of i,j
+      const b=ev(phi,{a:!!(i&(1<<k)), b:!!(j&(1<<k))});
+      acc = combineOp==="∧" ? (acc&&b) : combineOp==="∨" ? (acc||b) : (acc!==b);
+    }
+    cells+=`<span class="${acc?'T':'F'}">${glyph(acc)}</span>`;
+  }
+  const cn={"∧":"AND","∨":"OR","⊕":"XOR"}[combineOp];
+  out.innerHTML=`<div class="verdict"><span class="sym">△</span><span class="why">${esc(show(phi))}  ·  ${cn} across bits  ·  ${S}×${S}</span></div>
+    <div class="fractalwrap"><div class="fractal" style="grid-template-columns:repeat(${S},1ch)">${cells}</div></div>
+    <p class="note">Each cell applies the formula to the two indices bit by bit, then ${cn}s the results. It's self-similar because it depends only on the binary digits.</p>`;
+}
+
+function renderCA(){
+  const out=$("#result"); const W=1<<fractalM, R=Math.max(1, W>>1);
+  let phi;
+  try{ phi=parse($("#ca-input").value); }
+  catch(e){ $("#ca-input").classList.add("bad");
+    out.innerHTML=`<p class="err">Can't read that — ${esc(e.message)}.</p>`; return; }
+  const stray=[...atomsOf(phi)].filter(v=>v!=="l"&&v!=="c"&&v!=="r");
+  if(stray.length){ $("#ca-input").classList.add("bad");
+    out.innerHTML=`<p class="err">Use only the neighbour variables l, c, r — not ${esc(stray.join(", "))}.</p>`; return; }
+  $("#ca-input").classList.remove("bad");
+  let row=new Array(W).fill(false); row[W>>1]=true;      // single seed, top row
+  let cells="";
+  for(let t=0;t<R;t++){
+    for(let x=0;x<W;x++) cells+=`<span class="${row[x]?'T':'F'}">${glyph(row[x])}</span>`;
+    const n=new Array(W).fill(false);                    // next row from neighbours
+    for(let x=0;x<W;x++){
+      const L=x>0?row[x-1]:false, C=row[x], Rr=x<W-1?row[x+1]:false;
+      n[x]=ev(phi,{l:L,c:C,r:Rr});
+    }
+    row=n;
+  }
+  out.innerHTML=`<div class="verdict"><span class="sym">△</span><span class="why">${esc(show(phi))}  ·  ${R} steps  ·  width ${W}</span></div>
+    <div class="fractalwrap"><div class="fractal" style="grid-template-columns:repeat(${W},1ch)">${cells}</div></div>
+    <p class="note">Row after row, each cell is the rule applied to its three neighbours above. Time runs downward.</p>`;
+}
+
+/* ===== PROOF: step-by-step derivation by logical equivalences ===== */
+const TOP={t:"const",v:true}, BOT={t:"const",v:false};
+const neg=a=>({t:"¬",a}), conj=(a,b)=>({t:"∧",a,b}), disj=(a,b)=>({t:"∨",a,b});
+const same=(a,b)=>show(a)===show(b);
+function elimEq(n){ if(n.t==="atom"||n.t==="const")return n;
+  if(n.t==="¬")return neg(elimEq(n.a));
+  const a=elimEq(n.a),b=elimEq(n.b);
+  if(n.t==="↔")return conj({t:"→",a,b},{t:"→",a:b,b:a});
+  if(n.t==="↮"||n.t==="⊕")return disj(conj(a,neg(b)),conj(neg(a),b));
+  return {t:n.t,a,b}; }
+function elimImp(n){ if(n.t==="atom"||n.t==="const")return n;
+  if(n.t==="¬")return neg(elimImp(n.a));
+  const a=elimImp(n.a),b=elimImp(n.b);
+  if(n.t==="→")return disj(neg(a),b);
+  if(n.t==="←")return disj(a,neg(b));
+  return {t:n.t,a,b}; }
+function nnf(n){ if(n.t==="atom"||n.t==="const")return n;
+  if(n.t==="∧")return conj(nnf(n.a),nnf(n.b));
+  if(n.t==="∨")return disj(nnf(n.a),nnf(n.b));
+  if(n.t==="¬"){const y=n.a;
+    if(y.t==="atom")return n;
+    if(y.t==="const")return y.v?BOT:TOP;
+    if(y.t==="¬")return nnf(y.a);
+    if(y.t==="∧")return disj(nnf(neg(y.a)),nnf(neg(y.b)));
+    if(y.t==="∨")return conj(nnf(neg(y.a)),nnf(neg(y.b))); }
+  return n; }
+function cnf(n){ if(n.t==="∧")return conj(cnf(n.a),cnf(n.b));
+  if(n.t==="∨")return distr(cnf(n.a),cnf(n.b)); return n; }
+function distr(a,b){ if(a.t==="∧")return conj(distr(a.a,b),distr(a.b,b));
+  if(b.t==="∧")return conj(distr(a,b.a),distr(a,b.b)); return disj(a,b); }
+function simp(n){ if(n.t==="atom"||n.t==="const")return n;
+  if(n.t==="¬")return neg(simp(n.a));
+  let a=simp(n.a),b=simp(n.b);
+  if(n.t==="∧"){ if(a.t==="const")return a.v?b:BOT; if(b.t==="const")return b.v?a:BOT;
+    if(same(a,b))return a; if(same(a,neg(b))||same(neg(a),b))return BOT; return conj(a,b); }
+  if(n.t==="∨"){ if(a.t==="const")return a.v?TOP:b; if(b.t==="const")return b.v?TOP:a;
+    if(same(a,b))return a; if(same(a,neg(b))||same(neg(a),b))return TOP; return disj(a,b); }
+  return {t:n.t,a,b}; }
+function clausesOf(n){ return n.t==="∧" ? [...clausesOf(n.a),...clausesOf(n.b)] : [n]; }
+function litsOf(n){ return n.t==="∨" ? [...litsOf(n.a),...litsOf(n.b)] : [n]; }
+function clauseValid(c){ const L=litsOf(c); return L.some(x=>L.some(y=>same(x,neg(y))||same(neg(x),y))); }
+function flatten(op,n,acc){ if(n.t===op){flatten(op,n.a,acc);flatten(op,n.b,acc);} else acc.push(n); return acc; }
+function showF(a){ if(a.t==="atom")return a.v; if(a.t==="const")return a.v?"⊤":"⊥";
+  if(a.t==="¬"){const c=a.a,s=showF(c); return "¬"+((c.t==="atom"||c.t==="¬"||c.t==="const")?s:"("+s+")");}
+  const p=PREC[a.t];
+  if(a.t==="∧"||a.t==="∨"){ const parts=flatten(a.t,a,[]),seen=new Set(),uniq=[];
+    for(const q of parts){const k=showF(q); if(!seen.has(k)){seen.add(k);uniq.push([q,k]);}}
+    return uniq.map(([q,s])=>(q.t!=="atom"&&q.t!=="¬"&&q.t!=="const"&&PREC[q.t]<p)?"("+s+")":s).join(" "+a.t+" "); }
+  const w=(c,side)=>{const s=showF(c); if(c.t==="atom"||c.t==="const"||c.t==="¬")return s;
+    return (PREC[c.t]<p||(PREC[c.t]===p&&(RIGHT[a.t]?side==="L":side==="R")))?"("+s+")":s;};
+  return w(a.a,"L")+" "+a.t+" "+w(a.b,"R"); }
+function derive(ast){ let cur=ast; const steps=[["given",cur]];
+  const stage=(name,fn)=>{const nx=fn(cur); if(!same(nx,cur)){steps.push([name,nx]);cur=nx;}};
+  stage("eliminate ↔ / ⊕  ·  definition of biconditional", elimEq);
+  stage("eliminate →  ·  a → b ≡ ¬a ∨ b", elimImp);
+  stage("push negations in  ·  De Morgan, double negation", nnf);
+  stage("distribute ∨ over ∧  ·  conjunctive normal form", cnf);
+  stage("simplify  ·  identity, complement, idempotent", simp);
+  const cs=clausesOf(cur), valid=same(cur,TOP)||cs.every(c=>same(c,TOP)||clauseValid(c));
+  return {steps,valid}; }
+function renderProofAuto(){
+  const out=$("#result"); let ast;
+  try{ ast=parse($("#p-input").value); }
+  catch(e){ $("#p-input").classList.add("bad");
+    out.innerHTML=`<p class="err">Can't read that — ${esc(e.message)}.</p>`; return; }
+  $("#p-input").classList.remove("bad");
+  const r=derive(ast);
+  let rows="";
+  r.steps.forEach(([name,f],i)=>{ rows+=`<div class="step"><span class="sn">${i}</span><span class="sf">${esc(showF(f))}</span><span class="sl">${esc(name)}</span></div>`; });
+  const v = r.valid
+    ? `<div class="verdict"><span class="sym">⊢</span>theorem <span class="why">— the laws alone reduce it to ⊤, no truth table needed.</span></div>`
+    : `<div class="verdict"><span class="sym">⊬</span>not a theorem <span class="why">— the laws can't drive it to ⊤; a clause has no complementary pair.</span></div>`;
+  out.innerHTML=`${v}<div class="proof">${rows}</div>
+    <p class="note">Each line rewrites the one above by the named law.${r.valid?"":" Switch to the formula tab to see the world where it fails."}</p>`;
+}
+
+/* ---- interactive: address a sub-expression, apply one named law, check the goal ---- */
+function getNode(ast,path){ let n=ast; for(const k of path) n=n[k]; return n; }
+function setNode(ast,path,repl){ if(path.length===0)return repl;
+  const [k,...rest]=path; const c={...ast}; c[k]=setNode(ast[k],rest,repl); return c; }
+const LAWS=[
+  {name:"implication", f:n=>{
+    if(n.t==="→")return disj(neg(n.a),n.b);
+    if(n.t==="←")return disj(n.a,neg(n.b));
+    if(n.t==="∨"&&n.a.t==="¬")return {t:"→",a:n.a.a,b:n.b};
+    return null;}},
+  {name:"biconditional", f:n=>{
+    if(n.t==="↔")return conj({t:"→",a:n.a,b:n.b},{t:"→",a:n.b,b:n.a});
+    if(n.t==="∧"&&n.a.t==="→"&&n.b.t==="→"&&same(n.a.a,n.b.b)&&same(n.a.b,n.b.a))return {t:"↔",a:n.a.a,b:n.a.b};
+    return null;}},
+  {name:"contrapositive", f:n=> n.t==="→"?{t:"→",a:neg(n.b),b:neg(n.a)} : null},
+  {name:"De Morgan", f:n=>{
+    if(n.t==="¬"&&n.a.t==="∧")return disj(neg(n.a.a),neg(n.a.b));
+    if(n.t==="¬"&&n.a.t==="∨")return conj(neg(n.a.a),neg(n.a.b));
+    if(n.t==="∨"&&n.a.t==="¬"&&n.b.t==="¬")return neg(conj(n.a.a,n.b.a));
+    if(n.t==="∧"&&n.a.t==="¬"&&n.b.t==="¬")return neg(disj(n.a.a,n.b.a));
+    return null;}},
+  {name:"double negation", f:n=> n.t==="¬"&&n.a.t==="¬" ? n.a.a : null},
+  {name:"distribute", f:n=>{
+    if(n.t==="∧"&&n.b.t==="∨")return disj(conj(n.a,n.b.a),conj(n.a,n.b.b));
+    if(n.t==="∧"&&n.a.t==="∨")return disj(conj(n.a.a,n.b),conj(n.a.b,n.b));
+    if(n.t==="∨"&&n.b.t==="∧")return conj(disj(n.a,n.b.a),disj(n.a,n.b.b));
+    if(n.t==="∨"&&n.a.t==="∧")return conj(disj(n.a.a,n.b),disj(n.a.b,n.b)); return null;}},
+  {name:"factor", f:n=>{ const fac=(outer,inner)=>{ if(n.t===outer&&n.a.t===inner&&n.b.t===inner){
+      const A=[n.a.a,n.a.b],B=[n.b.a,n.b.b];
+      for(let i=0;i<2;i++)for(let j=0;j<2;j++) if(same(A[i],B[j]))
+        return {t:inner,a:A[i],b:{t:outer,a:A[1-i],b:B[1-j]}}; } return null;};
+    return fac("∨","∧")||fac("∧","∨"); }},
+  {name:"associativity", f:n=>{ if(n.t==="∧"||n.t==="∨"){
+      if(n.a.t===n.t)return {t:n.t,a:n.a.a,b:{t:n.t,a:n.a.b,b:n.b}};
+      if(n.b.t===n.t)return {t:n.t,a:{t:n.t,a:n.a,b:n.b.a},b:n.b.b}; } return null;}},
+  {name:"commutativity", f:n=> (n.t==="∧"||n.t==="∨")?{t:n.t,a:n.b,b:n.a} : null},
+  {name:"identity", f:n=>{
+    if(n.t==="∧"&&n.b.t==="const"&&n.b.v)return n.a; if(n.t==="∧"&&n.a.t==="const"&&n.a.v)return n.b;
+    if(n.t==="∨"&&n.b.t==="const"&&!n.b.v)return n.a; if(n.t==="∨"&&n.a.t==="const"&&!n.a.v)return n.b; return null;}},
+  {name:"domination", f:n=>{
+    if(n.t==="∨"&&((n.a.t==="const"&&n.a.v)||(n.b.t==="const"&&n.b.v)))return TOP;
+    if(n.t==="∧"&&((n.a.t==="const"&&!n.a.v)||(n.b.t==="const"&&!n.b.v)))return BOT; return null;}},
+  {name:"idempotence", f:n=> (n.t==="∧"||n.t==="∨")&&same(n.a,n.b)?n.a:null},
+  {name:"absorption", f:n=>{
+    if(n.t==="∨"){ if(n.b.t==="∧"&&(same(n.b.a,n.a)||same(n.b.b,n.a)))return n.a;
+                   if(n.a.t==="∧"&&(same(n.a.a,n.b)||same(n.a.b,n.b)))return n.b; }
+    if(n.t==="∧"){ if(n.b.t==="∨"&&(same(n.b.a,n.a)||same(n.b.b,n.a)))return n.a;
+                   if(n.a.t==="∨"&&(same(n.a.a,n.b)||same(n.a.b,n.b)))return n.b; }
+    return null;}},
+  {name:"complement", f:n=>{
+    if(n.t==="∨"&&(same(n.a,neg(n.b))||same(neg(n.a),n.b)))return TOP;
+    if(n.t==="∧"&&(same(n.a,neg(n.b))||same(neg(n.a),n.b)))return BOT; return null;}},
+  {name:"negate constant", f:n=> n.t==="¬"&&n.a.t==="const"?(n.a.v?BOT:TOP):null},
+];
+const LAWByName=Object.fromEntries(LAWS.map(L=>[L.name,L]));
+function canon(n){ if(n.t==="atom")return n.v; if(n.t==="const")return n.v?"⊤":"⊥";
+  if(n.t==="¬")return "¬"+canon(n.a);
+  if(n.t==="∧"||n.t==="∨"){ const parts=[...new Set(flatten(n.t,n,[]).map(canon))].sort();
+    return "("+parts.join(n.t)+")"; }
+  return "("+canon(n.a)+n.t+canon(n.b)+")"; }
+const match=(a,b)=>canon(a)===canon(b);
+function childHTML(c,cpath,sel,pp,side,pop){ const s=renderNodeHTML(c,cpath,sel);
+  if(c.t==="atom"||c.t==="const"||c.t==="¬")return s;
+  const need=PREC[c.t]<pp||(PREC[c.t]===pp&&(RIGHT[pop]?side==="L":side==="R"));
+  return need?"("+s+")":s; }
+function renderNodeHTML(n,path,sel){ const ps=path.join(""), selCls=ps===sel?" sel":""; let inner;
+  if(n.t==="atom")inner=esc(n.v);
+  else if(n.t==="const")inner=n.v?"⊤":"⊥";
+  else if(n.t==="¬"){ const cs=renderNodeHTML(n.a,[...path,"a"],sel);
+    const paren=!(n.a.t==="atom"||n.a.t==="¬"||n.a.t==="const"); inner="¬"+(paren?"("+cs+")":cs); }
+  else{ const p=PREC[n.t];
+    inner=childHTML(n.a,[...path,"a"],sel,p,"L",n.t)+" "+esc(n.t)+" "+childHTML(n.b,[...path,"b"],sel,p,"R",n.t); }
+  return `<span class="node${selCls}" data-p="${ps}">${inner}</span>`; }
+let iCur=null,iTarget=null,iHistory=[],iSel=null,iErr=null;
+function initInteractive(){
+  try{ iCur=parse($("#pi-from").value); iTarget=parse($("#pi-to").value); iErr=null;
+    iHistory=[{name:"start",ast:iCur}]; iSel=null; }
+  catch(e){ iErr="Can't read that — "+e.message+"."; iCur=null; } }
+function renderProofInter(){
+  const out=$("#result");
+  if(iErr){ out.innerHTML=`<p class="err">${esc(iErr)}</p>`; return; }
+  if(!iCur){ out.innerHTML=`<p class="note">Give a “from” and a “to”, then transform one into the other.</p>`; return; }
+  const done=match(iCur,iTarget);
+  const expr=`<div class="expr">${renderNodeHTML(iCur,[],iSel)}</div>`;
+  let lawUI;
+  if(done){ lawUI=`<p class="note" style="color:var(--ink)">Reached the target — done ✓</p>`; }
+  else if(iSel===null){ lawUI=`<p class="note">Tap a sub-expression above to select it.</p>`; }
+  else{ const node=getNode(iCur, iSel===""?[]:iSel.split(""));
+    const apps=LAWS.filter(L=>L.f(node)!==null);
+    lawUI = apps.length
+      ? `<div class="laws">`+apps.map(L=>`<button class="lawbtn" data-law="${esc(L.name)}">${esc(L.name)}</button>`).join("")+`</div>`
+      : `<p class="note">No law applies to <b>${esc(show(node))}</b> — pick another part.</p>`; }
+  const log=iHistory.map((h,i)=>`<div class="step"><span class="sn">${i}</span><span class="sf">${esc(showF(h.ast))}</span><span class="sl">${esc(h.name)}</span></div>`).join("");
+  out.innerHTML=`<div class="verdict"><span class="sym">${done?"✓":"⟶"}</span><span class="why">goal: ${esc(show(iTarget))}</span></div>
+    ${expr}${lawUI}
+    <div class="pi-ctrl"><button id="pi-undo">undo</button><button id="pi-reset">reset</button></div>
+    <p class="label" style="margin-top:1.4rem">Derivation</p><div class="proof">${log}</div>`;
+}
+function renderProof(){ return proofMode==="auto" ? renderProofAuto() : renderProofInter(); }
+
 let mode="formula";
 let notation="tf";
+let fractalM=5;                       // grid is 2^m on a side
+let combineOp="∧";                    // how per-bit results are combined
+let fracGen="bitwise";                // which fractal engine is active
+let proofMode="auto";                 // 'auto' = worked derivation, 'interactive' = student-driven
 const glyph=v=>notation==="01"?(v?"1":"0"):(v?"T":"F");
-const render=()=>mode==="formula"?renderFormula():renderArgument();
+const render=()=> mode==="formula" ? renderFormula()
+               : mode==="argument"  ? renderArgument()
+               : mode==="proof"     ? renderProof()
+               : (fracGen==="bitwise" ? renderBitwise() : renderCA());
 
 function setNotation(n){notation=n;
   $("#not-tf").setAttribute("aria-selected",n==="tf");
@@ -332,7 +697,7 @@ document.querySelectorAll(".palette").forEach(pal=>pal.querySelectorAll("button"
     const input=tg==="__focus__"?(lastFocused||$("#c-input")):$("#"+tg);
     insertAt(input,b.textContent); render();})));
 document.querySelectorAll("[data-clear]").forEach(b=>b.addEventListener("click",()=>{
-  const i=$("#"+b.dataset.clear); i.value=""; i.focus(); render();}));
+  const i=$("#"+b.dataset.clear); i.value=""; i.focus(); i.dispatchEvent(new Event("input"));}));
 
 function addPremise(val){const w=document.createElement("div"); w.className="premise";
   w.innerHTML=`<span class="n"></span>
@@ -344,11 +709,17 @@ function addPremise(val){const w=document.createElement("div"); w.className="pre
 function renumber(){document.querySelectorAll("#premises .n").forEach((t,i)=>t.textContent=(i+1)+".");}
 $("#add-premise").addEventListener("click",()=>{addPremise("");render();});
 
-function setMode(m){mode=m;const f=m==="formula";
-  $("#tab-formula").setAttribute("aria-selected",f); $("#tab-argument").setAttribute("aria-selected",!f);
-  $("#panel-formula").hidden=!f; $("#panel-argument").hidden=f; render();}
+const PANELS=["formula","argument","proof","fractal"];
+function setMode(m){mode=m;
+  PANELS.forEach(p=>{
+    $("#tab-"+p).setAttribute("aria-selected", p===m);
+    $("#panel-"+p).hidden = (p!==m);
+  });
+  render();}
 $("#tab-formula").addEventListener("click",()=>setMode("formula"));
 $("#tab-argument").addEventListener("click",()=>setMode("argument"));
+$("#tab-fractal").addEventListener("click",()=>setMode("fractal"));
+$("#tab-proof").addEventListener("click",()=>setMode("proof"));
 $("#f-input").addEventListener("input",render);
 $("#c-input").addEventListener("input",render);
 
@@ -366,6 +737,140 @@ A_EGS.forEach((ex,i)=>{const a=document.createElement("a");a.textContent=ex.name
   a.addEventListener("keydown",e=>{if(e.key==="Enter")a.click();});
   if(i)ae.appendChild(Object.assign(document.createElement("span"),{className:"sep",textContent:"·"}));
   ae.appendChild(a);});
+
+// sierpiński size links
+const ss=$("#s-sizes"); const SIZES=[3,4,5,6];
+function drawSizes(){ ss.innerHTML="";
+  SIZES.forEach((m,i)=>{ const a=document.createElement("a"); a.textContent=(1<<m); a.tabIndex=0;
+    if(m===fractalM){a.style.color="var(--ink)"; a.style.borderBottomColor="var(--ink)";}
+    a.addEventListener("click",()=>{fractalM=m; drawSizes(); render();});
+    a.addEventListener("keydown",e=>{if(e.key==="Enter")a.click();});
+    if(i)ss.appendChild(Object.assign(document.createElement("span"),{className:"sep",textContent:"·"}));
+    ss.appendChild(a);});
+}
+drawSizes();
+
+// combine-op toggle
+const sc=$("#s-combine"); const COMBS=["∧","∨","⊕"];
+function drawCombine(){ sc.innerHTML="";
+  COMBS.forEach((c,i)=>{ const a=document.createElement("a"); a.textContent=c; a.tabIndex=0;
+    if(c===combineOp){a.style.color="var(--ink)"; a.style.borderBottomColor="var(--ink)";}
+    a.addEventListener("click",()=>{combineOp=c; drawCombine(); render();});
+    a.addEventListener("keydown",e=>{if(e.key==="Enter")a.click();});
+    if(i)sc.appendChild(Object.assign(document.createElement("span"),{className:"sep",textContent:"·"}));
+    sc.appendChild(a);});
+}
+drawCombine();
+
+// texture presets — set formula + combine together
+const sp=$("#s-presets");
+const PRESETS=[
+  {n:"gasket", f:"¬(a ∧ b)", c:"∧"},
+  {n:"plaid", f:"a ∧ b", c:"⊕"},
+  {n:"hamming", f:"a ⊕ b", c:"⊕"},
+  {n:"thue–morse", f:"a", c:"⊕"},
+];
+PRESETS.forEach((p,i)=>{ const a=document.createElement("a"); a.textContent=p.n; a.tabIndex=0;
+  const go=()=>{ $("#s-input").value=p.f; combineOp=p.c; drawCombine(); render(); };
+  a.addEventListener("click",go);
+  a.addEventListener("keydown",e=>{if(e.key==="Enter")go();});
+  if(i)sp.appendChild(Object.assign(document.createElement("span"),{className:"sep",textContent:"·"}));
+  sp.appendChild(a);});
+
+$("#s-input").addEventListener("input",render);
+
+// fractal generator toggle
+const gp=$("#gen-pick"); const GENS=["bitwise","automaton"];
+function drawGen(){ gp.innerHTML="";
+  GENS.forEach((g,i)=>{ const a=document.createElement("a"); a.textContent=g; a.tabIndex=0;
+    if(g===fracGen){a.style.color="var(--ink)"; a.style.borderBottomColor="var(--ink)";}
+    const go=()=>{ fracGen=g; drawGen();
+      $("#gen-bitwise").hidden = g!=="bitwise";
+      $("#gen-automaton").hidden = g!=="automaton";
+      render(); };
+    a.addEventListener("click",go);
+    a.addEventListener("keydown",e=>{if(e.key==="Enter")go();});
+    if(i)gp.appendChild(Object.assign(document.createElement("span"),{className:"sep",textContent:"·"}));
+    gp.appendChild(a);});
+}
+drawGen();
+
+// automaton rule presets
+const cp=$("#ca-presets");
+const CA_PRESETS=[
+  {n:"rule 90", f:"l ⊕ r"},
+  {n:"rule 150", f:"l ⊕ c ⊕ r"},
+  {n:"rule 30", f:"l ⊕ (c ∨ r)"},
+];
+CA_PRESETS.forEach((p,i)=>{ const a=document.createElement("a"); a.textContent=p.n; a.tabIndex=0;
+  const go=()=>{ $("#ca-input").value=p.f; render(); };
+  a.addEventListener("click",go);
+  a.addEventListener("keydown",e=>{if(e.key==="Enter")go();});
+  if(i)cp.appendChild(Object.assign(document.createElement("span"),{className:"sep",textContent:"·"}));
+  cp.appendChild(a);});
+$("#ca-input").addEventListener("input",render);
+
+// proof example theorems
+const pe=$("#p-egs");
+const P_EGS=[
+  {en:"excluded middle", f:"P ∨ ¬P"},
+  {en:"de morgan", f:"¬(P ∧ Q) ↔ (¬P ∨ ¬Q)"},
+  {en:"hypothetical syllogism", f:"(P → Q) ∧ (Q → R) → (P → R)"},
+  {en:"contraposition", f:"(P → Q) ↔ (¬Q → ¬P)"},
+  {en:"not a theorem", f:"P → Q"},
+];
+P_EGS.forEach((ex,i)=>{ const a=document.createElement("a"); a.textContent=ex.en; a.tabIndex=0;
+  const go=()=>{ $("#p-input").value=ex.f; setMode("proof"); render(); };
+  a.addEventListener("click",go);
+  a.addEventListener("keydown",e=>{if(e.key==="Enter")go();});
+  if(i)pe.appendChild(Object.assign(document.createElement("span"),{className:"sep",textContent:"·"}));
+  pe.appendChild(a);});
+$("#p-input").addEventListener("input",render);
+
+// proof sub-mode: derive-for-me vs step-it-myself
+const pm=$("#pmode-pick"); const PMODES=[["auto","derive for me"],["interactive","step it myself"]];
+function drawPmode(){ pm.innerHTML="";
+  PMODES.forEach(([val,lab],i)=>{ const a=document.createElement("a"); a.textContent=lab; a.tabIndex=0;
+    if(val===proofMode){a.style.color="var(--ink)"; a.style.borderBottomColor="var(--ink)";}
+    const go=()=>{ proofMode=val; drawPmode();
+      $("#proof-auto").hidden=val!=="auto"; $("#proof-inter").hidden=val!=="interactive";
+      if(val==="interactive") initInteractive(); render(); };
+    a.addEventListener("click",go); a.addEventListener("keydown",e=>{if(e.key==="Enter")go();});
+    if(i)pm.appendChild(Object.assign(document.createElement("span"),{className:"sep",textContent:"·"}));
+    pm.appendChild(a);});
+}
+drawPmode();
+
+// interactive from/to
+$("#pi-from").addEventListener("input",()=>{initInteractive();render();});
+$("#pi-to").addEventListener("input",()=>{initInteractive();render();});
+const pie=$("#pi-egs");
+const PI_EGS=[
+  {n:"De Morgan", from:"¬(P ∧ Q)", to:"¬P ∨ ¬Q"},
+  {n:"implication", from:"P → Q", to:"¬P ∨ Q"},
+  {n:"contrapositive", from:"P → Q", to:"¬Q → ¬P"},
+  {n:"distribute", from:"P ∧ (Q ∨ R)", to:"(P ∧ Q) ∨ (P ∧ R)"},
+];
+PI_EGS.forEach((ex,i)=>{ const a=document.createElement("a"); a.textContent=ex.n; a.tabIndex=0;
+  const go=()=>{ $("#pi-from").value=ex.from; $("#pi-to").value=ex.to;
+    proofMode="interactive"; drawPmode(); $("#proof-auto").hidden=true; $("#proof-inter").hidden=false;
+    setMode("proof"); initInteractive(); render(); };
+  a.addEventListener("click",go); a.addEventListener("keydown",e=>{if(e.key==="Enter")go();});
+  if(i)pie.appendChild(Object.assign(document.createElement("span"),{className:"sep",textContent:"·"}));
+  pie.appendChild(a);});
+
+// delegated interaction inside the interactive derivation
+$("#result").addEventListener("click",e=>{
+  if(mode!=="proof"||proofMode!=="interactive")return;
+  if(e.target.closest("#pi-undo")){ if(iHistory.length>1){iHistory.pop(); iCur=iHistory[iHistory.length-1].ast; iSel=null; render();} return; }
+  if(e.target.closest("#pi-reset")){ initInteractive(); render(); return; }
+  const lb=e.target.closest(".lawbtn");
+  if(lb){ if(iSel===null)return; const path=iSel===""?[]:iSel.split(""); const node=getNode(iCur,path);
+    const L=LAWByName[lb.dataset.law]; if(L){ const nn=L.f(node);
+      if(nn){ iCur=setNode(iCur,path,nn); iHistory.push({name:lb.dataset.law,ast:iCur}); iSel=null; render(); } } return; }
+  const nd=e.target.closest(".node");
+  if(nd){ iSel=nd.dataset.p; render(); return; }
+});
 
 // init
 addPremise("B ∨ M"); addPremise("¬B");
