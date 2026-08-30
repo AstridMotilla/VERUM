@@ -50,13 +50,52 @@ input.bad{border-bottom-color:var(--ink); border-bottom-style:dashed}
 .x{font-family:inherit; background:none; border:0; color:var(--faint); font-size:1.1rem; cursor:pointer; padding:.2rem}
 .x:hover{color:var(--ink)}
 
-.palette{display:flex; gap:.9rem; margin:.9rem 0 0; align-items:center; flex-wrap:wrap}
-.palette span.hint{font-size:.62rem; color:var(--faint); letter-spacing:.1em}
-.palette button{
-  font-family:inherit; font-size:1.05rem; background:none; border:0; color:var(--muted); cursor:pointer; padding:0
-}
-.palette button:hover{color:var(--ink)}
-.palette button:focus-visible{outline:2px solid var(--ink); outline-offset:3px}
+.palette{margin:.9rem 0 0}
+.pkeys{display:flex; gap:.4rem; flex-wrap:wrap; align-items:flex-start}
+.pkeys button{font-family:inherit; background:none; border:0; cursor:pointer; color:var(--muted);
+  display:flex; flex-direction:column; align-items:center; gap:1px; padding:.15rem .4rem; border-radius:6px; min-width:2rem}
+.pkeys button .op{font-size:1.05rem; line-height:1.1}
+.pkeys button .cap{font-size:.56rem; letter-spacing:.02em; color:var(--faint); line-height:1; min-height:.7em}
+.pkeys button:hover{color:var(--ink); background:#f5f5f5}
+.pkeys button:hover .cap{color:var(--muted)}
+.pkeys button:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
+.pmore{font-family:inherit; font-size:.62rem; color:var(--muted); background:none; border:0; cursor:pointer; border-bottom:1px solid var(--hair2); padding:0 0 1px; align-self:center; margin-left:.3rem}
+.pmore:hover{color:var(--ink); border-bottom-color:var(--ink)}
+.pforms{margin-top:.8rem; border-top:1px solid var(--hair); padding-top:.6rem}
+.pfrow{display:flex; gap:.6rem; align-items:baseline; padding:.24rem 0; font-size:.72rem; flex-wrap:wrap}
+.pchip{font-family:inherit; font-size:.95rem; color:var(--ink); background:none; border:1px solid var(--hair2); border-radius:5px; cursor:pointer; padding:.02rem .4rem}
+.pchip:hover{background:var(--ink); color:#fff; border-color:var(--ink)}
+.pfn{color:var(--muted); min-width:7rem}
+.pfw{color:var(--faint)}
+.rsec{font-size:.6rem; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin:1.9rem 0 .5rem; padding-bottom:.3rem; border-bottom:1px solid var(--hair2)}
+.rentry{padding:.6rem 0; border-bottom:1px solid var(--hair)}
+.rentry:last-child{border-bottom:0}
+.rname{color:var(--ink); font-size:.88rem}
+.rname .tagx{font-size:.58rem; color:var(--muted); border:1px solid var(--hair2); border-radius:4px; padding:0 .32rem; margin-left:.5rem; letter-spacing:.06em; text-transform:uppercase}
+.rform{font-size:.92rem; color:var(--ink); margin:.2rem 0; word-break:break-word}
+.rmean{font-size:.78rem; color:var(--muted); line-height:1.65}
+.rorig{font-size:.68rem; color:var(--faint); margin-top:.2rem}
+.exintro{font-size:.76rem; color:var(--muted); margin:.1rem 0 .8rem; line-height:1.6}
+.exq{padding:.5rem 0; border-bottom:1px solid var(--hair)}
+.exq:last-child{border-bottom:0}
+.exrow{display:flex; justify-content:space-between; align-items:baseline; gap:.8rem; flex-wrap:wrap}
+.exf{font-size:.92rem; color:var(--ink)}
+.exworked{font-size:.56rem; text-transform:uppercase; letter-spacing:.1em; color:var(--faint); margin-left:.6rem}
+.exctrl{display:flex; gap:1rem; white-space:nowrap}
+.exopen,.exrev{font-family:inherit; font-size:.68rem; color:var(--muted); background:none; border:0; cursor:pointer; border-bottom:1px solid var(--hair2); padding:0 0 1px}
+.exopen:hover,.exrev:hover{color:var(--ink); border-bottom-color:var(--ink)}
+.exans{font-size:.78rem; color:var(--ink); margin-top:.45rem; padding-left:.8rem; border-left:2px solid var(--hair2); line-height:1.6}
+.exans .why{color:var(--muted)}
+.exopts{display:flex; gap:.5rem; flex-wrap:wrap; margin:.55rem 0 0}
+.exopt{font-family:inherit; font-size:.74rem; background:none; border:1px solid var(--hair2); color:var(--muted); border-radius:7px; padding:.3rem .7rem; cursor:pointer}
+.exopt:hover:not(:disabled){border-color:var(--ink); color:var(--ink)}
+.exopt:disabled{cursor:default}
+.exopt.right{border-color:var(--ink); color:var(--ink); font-weight:500}
+.exopt.right::before{content:"✓ "}
+.exopt.wrong{color:var(--faint); border-color:var(--hair)}
+.exopt.wrong::before{content:"✗ "}
+.exfb{font-size:.78rem; color:var(--ink); margin-top:.55rem; padding-left:.8rem; border-left:2px solid var(--hair2); line-height:1.6}
+.exfb .why{color:var(--muted)}
 
 /* ---- argument premises ---- */
 .premise{display:flex; align-items:center; gap:.6rem; margin-bottom:.8rem}
@@ -129,13 +168,15 @@ footer{max-width:660px; margin:5rem auto 0; font-size:.6rem; color:var(--faint);
   <div class="head">
     <div class="face">(=ↀωↀ=)</div>
     <h1>verum</h1>
-    <p class="tag">Propositional logic engine<br>for my math friends.</p>
+    <p class="tag">A hands-on tool for propositional logic<br>For my math friends at UASLP.</p>
   </div>
 
   <div class="modes" role="tablist" aria-label="Mode">
     <button id="tab-formula" role="tab" aria-selected="true">formula</button>
     <button id="tab-argument" role="tab" aria-selected="false">argument</button>
     <button id="tab-proof" role="tab" aria-selected="false">proof</button>
+    <button id="tab-reference" role="tab" aria-selected="false">reference</button>
+    <button id="tab-practice" role="tab" aria-selected="false">practice</button>
     <button id="tab-fractal" role="tab" aria-selected="false">fractal</button>
   </div>
 
@@ -195,11 +236,12 @@ footer{max-width:660px; margin:5rem auto 0; font-size:.6rem; color:var(--faint);
       </div>
       <div class="egs"><span class="lead">try</span><span id="p-egs"></span></div>
       <p class="tag" style="text-align:left; margin-top:1.4rem">
-        <span style="color:var(--ink)">How it works.</span> This proves a statement the way a course does
+        <span style="color:var(--ink)">How it works.</span> This proves a statement the way a course does —
         from principles, not a truth table. It rewrites the statement step by step with logical equivalences
         (eliminate → and ↔, De Morgan, distribute, simplify) until only ⊤ remains; reaching ⊤ from the laws
         alone is the proof. Put the same statement in the <span style="color:var(--ink)">formula</span> tab and
-        the truth table lands on the same verdict a different way.
+        the truth table lands on the same verdict a different way — that agreement is what soundness and
+        completeness mean.
       </p>
     </div>
 
@@ -228,10 +270,32 @@ footer{max-width:660px; margin:5rem auto 0; font-size:.6rem; color:var(--faint);
     </div>
   </section>
 
+  <!-- REFERENCE -->
+  <section id="panel-reference" hidden>
+    <p class="tag" style="text-align:left; margin-bottom:.2rem">
+      The named rules, laws, and theorems the other tabs use — each stated, explained in a line, and
+      placed. Every formula here was checked by the same engine that runs the tabs, so the statements
+      are exact. <span style="color:var(--ink)">∴</span> means “therefore”; <span style="color:var(--ink)">≡</span>
+      means “is logically equivalent to.”
+    </p>
+    <div id="ref-body"></div>
+  </section>
+
+  <!-- PRACTICE -->
+  <section id="panel-practice" hidden>
+    <p class="tag" style="text-align:left; margin-bottom:.2rem">
+      A study set. Each topic starts with a <span style="color:var(--ink)">worked</span> example — answer shown — then
+      gives problems to try. Work one, then check yourself: reveal the answer, or hit
+      <span style="color:var(--ink)">open ↗</span> to drop it into the matching tab and let the tool settle it.
+      Every answer here was computed by that same engine.
+    </p>
+    <div id="practice-body"></div>
+  </section>
+
   <!-- FRACTAL -->
   <section id="panel-fractal" hidden>
     <p class="tag" style="text-align:left; margin-bottom:1.4rem">
-      <span style="color:var(--ink)">A little easter egg.</span> These aren't proofs or
+      <span style="color:var(--ink)">An aside — where logic meets geometry.</span> These aren't proofs or
       truth tables. They show that the same Boolean operators, applied over positions or over time, draw
       fractals. It's here to connect the dots, not part of the logic core.
     </p>
@@ -287,7 +351,7 @@ footer{max-width:660px; margin:5rem auto 0; font-size:.6rem; color:var(--faint);
 
   <div id="result" class="result" aria-live="polite"></div>
 </main>
-<footer>Made by Daniel Motilla a.k.a Astrid (o w o)</footer>
+<footer>Made by Geometridae</footer>
 
 <script>
 /* ===== ENGINE (verified against the Maxima .mac) ===== */
@@ -295,6 +359,7 @@ const PREC={"↔":1,"↮":1,"→":2,"←":2,"∨":3,"⊕":3,"⊽":3,"∧":4,"⊼
 const RIGHT={"→":1,"←":1};
 const BINOPS=new Set(Object.keys(PREC));
 function normalize(s){return s
+  .replace(/⇔|⟺|≡/g,"↔").replace(/⇒|⟹/g,"→").replace(/∼/g,"¬")
   .replace(/<->|<=>|iff/gi,"↔").replace(/->|=>/g,"→")
   .replace(/\bxor\b|\(\+\)/gi,"⊕").replace(/\bnand\b/gi,"⊼").replace(/\bnor\b/gi,"⊽")
   .replace(/&&|&|\band\b/gi,"∧").replace(/\|\||\||\bor\b/gi,"∨")
@@ -309,6 +374,7 @@ function tokenize(s){const t=[];let i=0;while(i<s.length){const c=s[i];
     const w=s.slice(i,j);
     if(w==="T")t.push({k:"const",v:true});else if(w==="F")t.push({k:"const",v:false});
     else t.push({k:"atom",v:w}); i=j; continue;}
+  if("∀∃∄∈∉⊂⊃⊆⊇∪∩□◇".includes(c))throw new Error("“"+c+"” is predicate or set logic — verum handles propositional logic");
   throw new Error("I don't recognise “"+c+"”");}
   return t;}
 function parse(src){const toks=tokenize(normalize(src));let p=0;
@@ -667,6 +733,15 @@ function renderProofInter(){
 }
 function renderProof(){ return proofMode==="auto" ? renderProofAuto() : renderProofInter(); }
 
+function renderReference(){ $("#result").innerHTML=""; }
+function renderPractice(){ $("#result").innerHTML=""; }
+function openExercise(type,d){
+  if(type==="classify"){ $("#f-input").value=d.f; setMode("formula"); }
+  else if(type==="argument"){ $("#premises").innerHTML=""; d.prem.forEach(p=>addPremise(p)); $("#c-input").value=d.concl; setMode("argument"); }
+  else if(type==="theorem"){ proofMode="auto"; drawPmode(); $("#proof-auto").hidden=false; $("#proof-inter").hidden=true; $("#p-input").value=d.f; setMode("proof"); }
+  else if(type==="transform"){ $("#pi-from").value=d.from; $("#pi-to").value=d.to; proofMode="interactive"; drawPmode(); $("#proof-auto").hidden=true; $("#proof-inter").hidden=false; setMode("proof"); initInteractive(); render(); }
+}
+
 let mode="formula";
 let notation="tf";
 let fractalM=5;                       // grid is 2^m on a side
@@ -677,6 +752,8 @@ const glyph=v=>notation==="01"?(v?"1":"0"):(v?"T":"F");
 const render=()=> mode==="formula" ? renderFormula()
                : mode==="argument"  ? renderArgument()
                : mode==="proof"     ? renderProof()
+               : mode==="reference" ? renderReference()
+               : mode==="practice"  ? renderPractice()
                : (fracGen==="bitwise" ? renderBitwise() : renderCA());
 
 function setNotation(n){notation=n;
@@ -691,10 +768,48 @@ function insertAt(input,t){const s=input.selectionStart??input.value.length,e=in
   const p=s+t.length; input.focus(); input.setSelectionRange(p,p);}
 let lastFocused=null;
 document.addEventListener("focusin",e=>{if(e.target.matches('input[type=text]'))lastFocused=e.target;});
-document.querySelectorAll(".palette").forEach(pal=>pal.querySelectorAll("button").forEach(b=>
-  b.addEventListener("click",()=>{const tg=pal.dataset.target;
+// palette = a complete set of insert keys, plus a click-to-open "all forms"
+// panel that lays out every operation and every way to write it — nothing hidden.
+const OPS=[
+  {s:"¬",cap:"not"},{s:"∧",cap:"and"},{s:"∨",cap:"or"},{s:"→",cap:"then"},
+  {s:"↔",cap:"iff"},{s:"⊕",cap:"xor"},{s:"⊼",cap:"nand"},{s:"⊽",cap:"nor"},
+  {s:"⊤",cap:"true"},{s:"⊥",cap:"false"},{s:"(",cap:""},{s:")",cap:""},
+];
+const FORMS=[
+  {n:"not",s:"¬",w:"~  !  not   ·   ∼"},
+  {n:"and",s:"∧",w:"&  &&  and"},
+  {n:"or",s:"∨",w:"|  ||  or"},
+  {n:"implies (if…then)",s:"→",w:"->  =>   ·   ⇒  ⟹"},
+  {n:"iff (biconditional)",s:"↔",w:"<->  <=>  iff   ·   ⇔  ⟺  ≡"},
+  {n:"exclusive or",s:"⊕",w:"xor"},
+  {n:"nand (not-and)",s:"⊼",w:"nand"},
+  {n:"nor (not-or)",s:"⊽",w:"nor"},
+  {n:"converse (P if Q)",s:"←",w:"click to insert"},
+  {n:"not-iff",s:"↮",w:"click to insert"},
+  {n:"true",s:"⊤",w:"T  true"},
+  {n:"false",s:"⊥",w:"F  false"},
+];
+function mkKey(s,cap){ const b=document.createElement("button"); b.type="button"; b.dataset.ins=s;
+  const op=document.createElement("span"); op.className="op"; op.textContent=s;
+  const c=document.createElement("span"); c.className="cap"; c.textContent=cap; b.append(op,c); return b; }
+document.querySelectorAll(".palette").forEach(pal=>{
+  const tg=pal.dataset.target; pal.innerHTML="";
+  const keys=document.createElement("div"); keys.className="pkeys";
+  OPS.forEach(o=>keys.appendChild(mkKey(o.s,o.cap)));
+  const more=document.createElement("button"); more.type="button"; more.className="pmore"; more.textContent="all forms ▾";
+  keys.appendChild(more);
+  const forms=document.createElement("div"); forms.className="pforms"; forms.hidden=true;
+  FORMS.forEach(f=>{ const row=document.createElement("div"); row.className="pfrow";
+    const chip=document.createElement("button"); chip.type="button"; chip.className="pchip"; chip.dataset.ins=f.s; chip.textContent=f.s;
+    const nm=document.createElement("span"); nm.className="pfn"; nm.textContent=f.n;
+    const w=document.createElement("span"); w.className="pfw"; w.textContent=f.w;
+    row.append(chip,nm,w); forms.appendChild(row); });
+  pal.append(keys,forms);
+  more.addEventListener("click",()=>{ forms.hidden=!forms.hidden; more.textContent=forms.hidden?"all forms ▾":"all forms ▴"; });
+  pal.addEventListener("click",e=>{ const b=e.target.closest("button[data-ins]"); if(!b)return;
     const input=tg==="__focus__"?(lastFocused||$("#c-input")):$("#"+tg);
-    insertAt(input,b.textContent); render();})));
+    insertAt(input,b.dataset.ins); render(); });
+});
 document.querySelectorAll("[data-clear]").forEach(b=>b.addEventListener("click",()=>{
   const i=$("#"+b.dataset.clear); i.value=""; i.focus(); i.dispatchEvent(new Event("input"));}));
 
@@ -708,7 +823,7 @@ function addPremise(val){const w=document.createElement("div"); w.className="pre
 function renumber(){document.querySelectorAll("#premises .n").forEach((t,i)=>t.textContent=(i+1)+".");}
 $("#add-premise").addEventListener("click",()=>{addPremise("");render();});
 
-const PANELS=["formula","argument","proof","fractal"];
+const PANELS=["formula","argument","proof","reference","practice","fractal"];
 function setMode(m){mode=m;
   PANELS.forEach(p=>{
     $("#tab-"+p).setAttribute("aria-selected", p===m);
@@ -719,6 +834,8 @@ $("#tab-formula").addEventListener("click",()=>setMode("formula"));
 $("#tab-argument").addEventListener("click",()=>setMode("argument"));
 $("#tab-fractal").addEventListener("click",()=>setMode("fractal"));
 $("#tab-proof").addEventListener("click",()=>setMode("proof"));
+$("#tab-reference").addEventListener("click",()=>setMode("reference"));
+$("#tab-practice").addEventListener("click",()=>setMode("practice"));
 $("#f-input").addEventListener("input",render);
 $("#c-input").addEventListener("input",render);
 
@@ -873,7 +990,145 @@ $("#result").addEventListener("click",e=>{
 
 // init
 addPremise("B ∨ M"); addPremise("¬B");
-render();
-</script>
+
+// reference content — generated from the machine-verified list
+const REF=[
+  {sec:"Valid argument forms", items:[
+    {n:"Modus ponens", f:"P → Q,  P   ∴   Q", m:"Given a conditional and its antecedent, the consequent follows.", o:"Stoic and medieval logic — modus ponendo ponens, “affirming, it affirms.”"},
+    {n:"Modus tollens", f:"P → Q,  ¬Q   ∴   ¬P", m:"If the consequent fails, the antecedent must fail too.", o:"modus tollendo tollens, “denying, it denies.”"},
+    {n:"Hypothetical syllogism", f:"P → Q,  Q → R   ∴   P → R", m:"Conditionals chain — implication is transitive.", o:"The “chain rule” for conditionals; classical."},
+    {n:"Disjunctive syllogism", f:"P ∨ Q,  ¬P   ∴   Q", m:"One of two holds; rule one out and the other stands.", o:"modus tollendo ponens; Stoic logic."},
+    {n:"Constructive dilemma", f:"P → Q,  R → S,  P ∨ R   ∴   Q ∨ S", m:"Two conditionals plus a choice between antecedents gives a choice between consequents.", o:"The classical “dilemma.”"},
+    {n:"Simplification", f:"P ∧ Q   ∴   P", m:"From a conjunction, either part follows on its own.", o:"∧-elimination."},
+    {n:"Conjunction", f:"P,  Q   ∴   P ∧ Q", m:"Two established truths combine into their conjunction.", o:"∧-introduction."},
+    {n:"Addition", f:"P   ∴   P ∨ Q", m:"A truth entails any disjunction that includes it.", o:"∨-introduction."},
+  ]},
+  {sec:"Fallacies to avoid", items:[
+    {n:"Affirming the consequent", bad:true, f:"P → Q,  Q   ⊭   P", m:"The consequent can hold for other reasons. Counterexample: P false, Q true.", o:"The classic mistake with conditionals."},
+    {n:"Denying the antecedent", bad:true, f:"P → Q,  ¬P   ⊭   Q", m:"Ruling out the antecedent doesn't rule out the consequent. Counterexample: P false, Q true.", o:"Invalid, though it feels persuasive."},
+  ]},
+  {sec:"Logical equivalences — the laws", items:[
+    {n:"Identity", f:"P ∧ ⊤ ≡ P     P ∨ ⊥ ≡ P", m:"⊤ drops out of an ∧; ⊥ drops out of an ∨."},
+    {n:"Domination", f:"P ∨ ⊤ ≡ ⊤     P ∧ ⊥ ≡ ⊥", m:"⊤ swallows an ∨; ⊥ swallows an ∧."},
+    {n:"Idempotence", f:"P ∧ P ≡ P     P ∨ P ≡ P", m:"Repeating a term adds nothing."},
+    {n:"Double negation", f:"¬¬P ≡ P", m:"Two negations cancel.", o:"Classical; the ¬¬P ⇒ P direction is rejected in intuitionistic logic."},
+    {n:"Commutativity", f:"P ∧ Q ≡ Q ∧ P     P ∨ Q ≡ Q ∨ P", m:"Order doesn't matter for ∧ or ∨."},
+    {n:"Associativity", f:"(P ∧ Q) ∧ R ≡ P ∧ (Q ∧ R)", m:"Grouping doesn't matter for ∧ (and likewise for ∨)."},
+    {n:"Distributivity", f:"P ∧ (Q ∨ R) ≡ (P ∧ Q) ∨ (P ∧ R)", m:"∧ distributes over ∨, and ∨ over ∧.", o:"A defining law of Boolean algebra (George Boole, 1854)."},
+    {n:"De Morgan's laws", f:"¬(P ∧ Q) ≡ ¬P ∨ ¬Q     ¬(P ∨ Q) ≡ ¬P ∧ ¬Q", m:"Negation swaps ∧ and ∨.", o:"Named for Augustus De Morgan (19th c.); equivalents were known to medieval logicians."},
+    {n:"Absorption", f:"P ∨ (P ∧ Q) ≡ P     P ∧ (P ∨ Q) ≡ P", m:"A term absorbs what it already contains."},
+    {n:"Complement", f:"P ∨ ¬P ≡ ⊤     P ∧ ¬P ≡ ⊥", m:"A statement and its negation together exhaust, and separately exclude."},
+    {n:"Material implication", f:"P → Q ≡ ¬P ∨ Q", m:"The conditional is just “not-P or Q.”", o:"The material reading of “if … then.”"},
+    {n:"Contraposition", f:"P → Q ≡ ¬Q → ¬P", m:"A conditional is equivalent to its contrapositive."},
+    {n:"Biconditional", f:"P ↔ Q ≡ (P → Q) ∧ (Q → P)", m:"“If and only if” is implication running both ways."},
+  ]},
+  {sec:"Named theorems", items:[
+    {n:"Law of excluded middle", f:"P ∨ ¬P", m:"Every statement is either true or false — no third option.", o:"Aristotle — tertium non datur."},
+    {n:"Law of non-contradiction", f:"¬(P ∧ ¬P)", m:"No statement is both true and false at once.", o:"Aristotle, Metaphysics."},
+    {n:"Peirce's law", f:"((P → Q) → P) → P", m:"A tautology written with only →, surprising because it needs no negation.", o:"C. S. Peirce, 1885; classically valid, but not provable in intuitionistic logic."},
+  ]},
+];
+const rb=$("#ref-body");
+REF.forEach(sec=>{ const h=document.createElement("p"); h.className="rsec"; h.textContent=sec.sec; rb.appendChild(h);
+  sec.items.forEach(it=>{ const d=document.createElement("div"); d.className="rentry";
+    d.innerHTML=`<div class="rname">${esc(it.n)}${it.bad?' <span class="tagx">invalid</span>':''}</div>`+
+      `<div class="rform">${esc(it.f)}</div><div class="rmean">${esc(it.m)}</div>`+
+      (it.o?`<div class="rorig">${esc(it.o)}</div>`:"");
+    rb.appendChild(d); });
+});
+
+// practice bank — answers computed by the engine; the problems grade you.
+const OPTS={ classify:["Tautology","Contradiction","Contingent"], argument:["Valid","Invalid"], theorem:["Theorem","Not a theorem"] };
+const BANK=[
+  {type:"classify", title:"Classify a formula",
+   intro:"Decide: tautology (true in every world), contradiction (false in every world), or contingent (it depends). Choose your answer — then it tells you, and you can open it in the formula tab to see the truth table.",
+   worked:[
+     {f:"P → (Q → P)", ans:"Tautology", why:"If P is false the outer → is vacuously true; if P is true the inner Q → P is true. So it holds in every world."},
+     {f:"P ∧ (¬P ∧ Q)", ans:"Contradiction", why:"It asks for P and ¬P at once, which no world can satisfy."},
+   ],
+   practice:[
+     {f:"(P → Q) → (¬Q → ¬P)", correct:"Tautology", explain:"The contrapositive law as a conditional — true in every world."},
+     {f:"(P ∨ Q) → P", correct:"Contingent", explain:"Fails when Q is true and P is false; holds otherwise."},
+     {f:"¬(P ↔ P)", correct:"Contradiction", explain:"P ↔ P is always true, so its negation is always false."},
+     {f:"(P ∧ Q) ∨ (¬P ∨ ¬Q)", correct:"Tautology", explain:"The right half is ¬(P ∧ Q), so this is X ∨ ¬X."},
+     {f:"P ⊕ (P ⊕ Q)", correct:"Contingent", explain:"XOR is associative and self-cancelling, so it reduces to Q."},
+   ]},
+  {type:"argument", title:"Valid or invalid?",
+   intro:"Decide whether the conclusion holds in every world where all premises do. Choose — then check. Invalid ones come with a counterexample.",
+   worked:[
+     {prem:["P → Q","Q → R"], concl:"P → R", ans:"Valid", why:"Conditionals chain — hypothetical syllogism."},
+     {prem:["P ∨ Q","¬P"], concl:"¬Q", ans:"Invalid", why:"With P false, P ∨ Q forces Q true, so ¬Q is false while both premises hold. Counterexample: P false, Q true."},
+   ],
+   practice:[
+     {prem:["P → Q","¬P"], concl:"¬Q", correct:"Invalid", explain:"Denying the antecedent. Counterexample: P false, Q true."},
+     {prem:["(P ∧ Q) → R","P","Q"], concl:"R", correct:"Valid", explain:"P and Q give P ∧ Q, then modus ponens gives R."},
+     {prem:["P ↔ Q","P"], concl:"Q", correct:"Valid", explain:"The biconditional together with P forces Q."},
+     {prem:["P → (Q ∨ R)","¬Q","¬R"], concl:"¬P", correct:"Valid", explain:"¬Q and ¬R give ¬(Q ∨ R); modus tollens then gives ¬P."},
+   ]},
+  {type:"theorem", title:"Theorem, or not?",
+   intro:"Decide whether it reduces to ⊤ by the laws — a theorem — or not. Choose, then open it in the proof tab to work it through.",
+   worked:[
+     {f:"(P ∧ Q) → P", ans:"Theorem", why:"Eliminate → to ¬(P ∧ Q) ∨ P, De Morgan to (¬P ∨ ¬Q) ∨ P; P with ¬P closes it to ⊤."},
+     {f:"¬(P ∧ ¬P)", ans:"Theorem", why:"The law of non-contradiction."},
+   ],
+   practice:[
+     {f:"(P → Q) ∨ (Q → P)", correct:"Theorem", explain:"A classical tautology — whatever the values, at least one conditional holds."},
+     {f:"(P → Q) → (Q → P)", correct:"Not a theorem", explain:"Fails when P is false and Q is true: T → F is false."},
+     {f:"((P → Q) ∧ ¬Q) → ¬P", correct:"Theorem", explain:"Modus tollens written as a single conditional."},
+     {f:"(P ∨ Q) → (Q ∨ P)", correct:"Theorem", explain:"∨ is commutative."},
+   ]},
+  {type:"transform", title:"Transform one into the other",
+   intro:"These pairs are equivalent — prove it by rewriting the first into the second. Open it in the proof tab (“step it myself”); reaching the target is the check. A route is there if you get stuck.",
+   worked:[
+     {from:"¬(P → Q)", to:"P ∧ ¬Q", ans:"Equivalent", why:"implication, then De Morgan, then double negation."},
+   ],
+   practice:[
+     {from:"P → (Q → R)", to:"(P ∧ Q) → R", route:"implication, implication, associativity, De Morgan, implication."},
+     {from:"¬(¬P ∧ ¬Q)", to:"P ∨ Q", route:"De Morgan, then double negation twice."},
+     {from:"(P ∧ Q) ∨ (P ∧ R)", to:"P ∧ (Q ∨ R)", route:"factor."},
+   ]},
+];
+const pbody=$("#practice-body");
+const exLabel=(type,d)=> type==="argument" ? d.prem.join(", ")+"   ∴   "+d.concl
+                       : type==="transform" ? d.from+"   ⟶   "+d.to : d.f;
+function el(tag,cls,txt){ const e=document.createElement(tag); if(cls)e.className=cls; if(txt!=null)e.textContent=txt; return e; }
+function workedItem(type,d){ const q=el("div","exq");
+  const row=el("div","exrow"); const f=el("span","exf",exLabel(type,d)); f.appendChild(el("span","exworked","worked")); row.appendChild(f);
+  const ctrl=el("span","exctrl"); const open=el("button","exopen","open ↗"); open.addEventListener("click",()=>openExercise(type,d)); ctrl.appendChild(open); row.appendChild(ctrl);
+  q.appendChild(row);
+  const ans=el("div","exans"); ans.innerHTML=`<b>${esc(d.ans)}.</b> <span class="why">${esc(d.why||"")}</span>`; q.appendChild(ans);
+  return q; }
+function mcItem(type,d){ const q=el("div","exq");
+  const row=el("div","exrow"); row.appendChild(el("span","exf",exLabel(type,d))); q.appendChild(row);
+  const opts=el("div","exopts"), fb=el("div","exfb"); fb.hidden=true;
+  const open=el("button","exopen","open ↗"); open.hidden=true; open.style.marginTop=".55rem"; open.addEventListener("click",()=>openExercise(type,d));
+  const buttons={};
+  OPTS[type].forEach(o=>{ const b=el("button","exopt",o); buttons[o]=b;
+    b.addEventListener("click",()=>{
+      Object.values(buttons).forEach(x=>x.disabled=true);
+      const ok=(o===d.correct); b.classList.add(ok?"right":"wrong");
+      if(!ok && buttons[d.correct]) buttons[d.correct].classList.add("right");
+      fb.hidden=false; fb.innerHTML=(ok?"<b>Correct.</b> ":`<b>Not quite — ${esc(d.correct)}.</b> `)+`<span class="why">${esc(d.explain)}</span>`;
+      open.hidden=false;
+    });
+    opts.appendChild(b); });
+  q.appendChild(opts); q.appendChild(fb); q.appendChild(open);
+  return q; }
+function transformItem(d){ const q=el("div","exq");
+  const row=el("div","exrow"); row.appendChild(el("span","exf",exLabel("transform",d)));
+  const ctrl=el("span","exctrl");
+  const open=el("button","exopen","open ↗"); open.addEventListener("click",()=>openExercise("transform",d)); ctrl.appendChild(open);
+  const hint=el("button","exrev","route ▾"); ctrl.appendChild(hint); row.appendChild(ctrl); q.appendChild(row);
+  const rt=el("div","exans"); rt.hidden=true; rt.innerHTML=`<span class="why">One route: ${esc(d.route)}</span>`; q.appendChild(rt);
+  hint.addEventListener("click",()=>{ rt.hidden=!rt.hidden; hint.textContent=rt.hidden?"route ▾":"route ▴"; });
+  return q; }
+BANK.forEach(sec=>{
+  pbody.appendChild(el("p","rsec",sec.title));
+  pbody.appendChild(el("p","exintro",sec.intro));
+  sec.worked.forEach(d=>pbody.appendChild(workedItem(sec.type,d)));
+  sec.practice.forEach(d=> pbody.appendChild(sec.type==="transform"?transformItem(d):mcItem(sec.type,d)));
+});
+
+render();</script>
 </body>
 </html>
